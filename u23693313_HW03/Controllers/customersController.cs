@@ -51,11 +51,10 @@ namespace u23693313_HW03.Controllers
             {
                 db.customers.Add(customer);
                 await db.SaveChangesAsync();
-
-                return Json(new { success = true, redirectTo = Url.Action("Index", "Home") });
+                return Json(new { success = true });
             }
 
-            return PartialView("Create", customer);
+            return PartialView(customer);
         }
 
         // GET: customers/Edit/5
@@ -84,7 +83,7 @@ namespace u23693313_HW03.Controllers
                 await db.SaveChangesAsync();
                 return Json(new { success = true });
             }
-            return PartialView("Create", customer);
+            return PartialView(customer);
         }
 
         // GET: customers/Delete/5

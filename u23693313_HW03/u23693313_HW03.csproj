@@ -645,7 +645,6 @@
     <Content Include="Views\products\Index.cshtml" />
     <Content Include="Views\Maintain\Index.cshtml" />
     <Content Include="Views\Report\Index.cshtml" />
-    <Content Include="Views\Report\_CurrentSalesReport.cshtml" />
     <Content Include="Views\Report\DeleteFile.cshtml" />
     <Content Include="Views\Report\_PopularProductReportPdf.cshtml" />
   </ItemGroup>

@@ -55,13 +55,11 @@ namespace u23693313_HW03.Controllers
             {
                 db.staffs.Add(staff);
                 await db.SaveChangesAsync();
-
-                return Json(new { success = true, redirectTo = Url.Action("Index", "Home") });
+                return Json(new { success = true });
             }
 
-            ViewBag.store_id = new SelectList(db.stores, "store_id", "store_name", staff.store_id);
             ViewBag.manager_id = new SelectList(db.staffs, "staff_id", "first_name", staff.manager_id);
-
+            ViewBag.store_id = new SelectList(db.stores, "store_id", "store_name", staff.store_id);
             return PartialView("Create", staff);
         }
 
@@ -93,9 +91,10 @@ namespace u23693313_HW03.Controllers
                 await db.SaveChangesAsync();
                 return Json(new { success = true });
             }
+
             ViewBag.manager_id = new SelectList(db.staffs, "staff_id", "first_name", staff.manager_id);
             ViewBag.store_id = new SelectList(db.stores, "store_id", "store_name", staff.store_id);
-            return PartialView("Create", staff);
+            return PartialView("Edit", staff);
         }
 
         // GET: staffs/Delete/5
@@ -113,7 +112,7 @@ namespace u23693313_HW03.Controllers
             return PartialView(staff);
         }
 
-        // POST: staffs/Delete/5
+        // POST: Staffs/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> DeleteConfirmed(int id)

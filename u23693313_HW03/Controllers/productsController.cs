@@ -60,12 +60,12 @@ namespace u23693313_HW03.Controllers
             {
                 db.products.Add(product);
                 await db.SaveChangesAsync();
-                return Json(new { success = true, redirectTo = Url.Action("Index", "Maintain") });
+                return Json(new { success = true });
             }
 
             ViewBag.brand_id = new SelectList(db.brands, "brand_id", "brand_name", product.brand_id);
             ViewBag.category_id = new SelectList(db.categories, "category_id", "category_name", product.category_id);
-            return PartialView("Create", product);
+            return PartialView(product);
         }
 
         // GET: products/Edit/5
@@ -98,7 +98,7 @@ namespace u23693313_HW03.Controllers
             }
             ViewBag.brand_id = new SelectList(db.brands, "brand_id", "brand_name", product.brand_id);
             ViewBag.category_id = new SelectList(db.categories, "category_id", "category_name", product.category_id);
-            return PartialView("Create", product);
+            return PartialView(product);
         }
 
         // GET: products/Delete/5
