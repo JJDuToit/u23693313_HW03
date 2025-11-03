@@ -1,0 +1,387 @@
+﻿@model u23693313_HW03.ViewModels.HomeViewModel
+@using u23693313_HW03.Helpers
+@{
+    ViewBag.Title = "Maintain Records";
+}
+
+<style>
+    .equal-height-row {
+        display: -webkit-flex;
+        display: flex;
+    }
+
+    .panel-flex {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+        .panel-flex .panel-body {
+            flex-grow: 1;
+        }
+
+    .rich-text-box {
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        padding: 8px;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #f9f9f9;
+        margin-top: 15px;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        padding: 2px 0;
+    }
+
+    .panel-top-section {
+        min-height: 50px;
+    }
+</style>
+
+<hr />
+
+<div class="row equal-height-row">
+
+    @* 1. Staff Panel *@
+    <div class="col-md-4">
+        <div class="panel panel-primary panel-flex">
+            <div class="panel-heading">
+                <h3 class="panel-title">Staff</h3>
+            </div>
+            <div class="panel-body" style="background-color: #eeeeee;">
+                <div class="panel-top-section">
+                    &nbsp;
+                </div>
+
+                @if (Model.StaffMember != null)
+                {
+                    <div class="detail-row">
+                        <strong>First Name:</strong>
+                        <span>@Model.StaffMember.first_name</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Last Name:</strong>
+                        <span>@Model.StaffMember.last_name</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Staff ID:</strong>
+                        <span>@Model.StaffMember.staff_id</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Store:</strong>
+                        <span>@Model.StaffMember.store.store_name</span>
+                    </div>
+
+                    <div class="rich-text-box">
+                        <ul class="list-unstyled">
+                            @foreach (var item in Model.StaffSales)
+                            {
+                                <li>
+                                    <strong>@item.product.product_name</strong> (x @item.quantity)
+                                    <br />
+                                    <small>On: @item.order.order_date.ToShortDateString()</small>
+                                </li>
+                            }
+                            @if (!Model.StaffSales.Any())
+                            {
+                                <li>No recent sales found.</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>No staff members found.</p>
+                }
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("<< Prev", "Index",
+                           new { staffPage = Model.StaffPaging.CurrentPage - 1, custPage = Model.CustomerPaging.CurrentPage, prodPage = Model.ProductPaging.CurrentPage, brandId = Request.QueryString["brandId"], categoryId = Request.QueryString["categoryId"] },
+                           new { @class = "btn btn-default " + (!Model.StaffPaging.HasPreviousPage ? "disabled" : "") })
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default disabled" style="width:100%">
+                            @Model.StaffPaging.CurrentPage / @Model.StaffPaging.TotalPages
+                        </button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("Next >>", "Index",
+                          new { staffPage = Model.StaffPaging.CurrentPage + 1, custPage = Model.CustomerPaging.CurrentPage, prodPage = Model.ProductPaging.CurrentPage, brandId = Request.QueryString["brandId"], categoryId = Request.QueryString["categoryId"] },
+                          new { @class = "btn btn-default " + (!Model.StaffPaging.HasNextPage ? "disabled" : "") })
+                    </div>
+                </div>
+
+                @if (Model.StaffMember != null)
+                {
+                    <div class="btn-group btn-group-justified" role="group" style="margin-top: 5px;">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" onclick="loadModal('@Url.Action("Edit", "Staffs", new { id = Model.StaffMember.staff_id })')">
+                                Edit
+                            </button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" onclick="loadModal('@Url.Action("Details", "Staffs", new { id = Model.StaffMember.staff_id })')">
+                                Details
+                            </button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onclick="loadModal('@Url.Action("Delete", "Staffs", new { id = Model.StaffMember.staff_id })')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @* 2. Customer Panel *@
+    <div class="col-md-4">
+        <div class="panel panel-info panel-flex">
+            <div class="panel-heading">
+                <h3 class="panel-title">Customers</h3>
+            </div>
+            <div class="panel-body" style="background-color: #eeeeee;">
+                <div class="panel-top-section">
+                    &nbsp;
+                </div>
+
+                @if (Model.Customer != null)
+                {
+                    <div class="detail-row">
+                        <strong>First Name:</strong>
+                        <span>@Model.Customer.first_name</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Last Name:</strong>
+                        <span>@Model.Customer.last_name</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Customer ID:</strong>
+                        <span>@Model.Customer.customer_id</span>
+                    </div>
+                    <div class="detail-row">
+                        <strong>Number:</strong>
+                        <span>@Model.Customer.phone</span>
+                    </div>
+
+                    <div class="rich-text-box">
+                        <ul class="list-unstyled">
+                            @foreach (var item in Model.CustomerPurchases)
+                            {
+                                <li>
+                                    <strong>@item.product.product_name</strong> (x @item.quantity)
+                                    <br />
+                                    <small>On: @item.order.order_date.ToShortDateString()</small>
+                                </li>
+                            }
+                            @if (!Model.CustomerPurchases.Any())
+                            {
+                                <li>No recent purchases found.</li>
+                            }
+                        </ul>
+                    </div>
+                }
+                else
+                {
+                    <p>No customers found.</p>
+                }
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("<< Prev", "Index",
+                           new { staffPage = Model.StaffPaging.CurrentPage, custPage = Model.CustomerPaging.CurrentPage - 1, prodPage = Model.ProductPaging.CurrentPage, brandId = Request.QueryString["brandId"], categoryId = Request.QueryString["categoryId"] },
+                           new { @class = "btn btn-default " + (!Model.CustomerPaging.HasPreviousPage ? "disabled" : "") })
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default disabled" style="width:100%">
+                            @Model.CustomerPaging.CurrentPage / @Model.CustomerPaging.TotalPages
+                        </button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("Next >>", "Index",
+                          new { staffPage = Model.StaffPaging.CurrentPage, custPage = Model.CustomerPaging.CurrentPage + 1, prodPage = Model.ProductPaging.CurrentPage, brandId = Request.QueryString["brandId"], categoryId = Request.QueryString["categoryId"] },
+                          new { @class = "btn btn-default " + (!Model.CustomerPaging.HasNextPage ? "disabled" : "") })
+                    </div>
+                </div>
+
+                @if (Model.Customer != null)
+                {
+                    <div class="btn-group btn-group-justified" role="group" style="margin-top: 5px;">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" onclick="loadModal('@Url.Action("Edit", "Customers", new { id = Model.Customer.customer_id })')">
+                                Edit
+                            </button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" onclick="loadModal('@Url.Action("Details", "Customers", new { id = Model.Customer.customer_id })')">
+                                Details
+                            </button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onclick="loadModal('@Url.Action("Delete", "Customers", new { id = Model.Customer.customer_id })')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    @* 3. Product Panel *@
+    <div class="col-md-4">
+        <div class="panel panel-default panel-flex">
+            <div class="panel-heading">
+                <h3 class="panel-title">Products</h3>
+            </div>
+            <div class="panel-body" style="background-color: #eeeeee;">
+                <div class="panel-top-section">
+                    @using (Html.BeginForm("Index", "Maintain", FormMethod.Get, new { @class = "form-inline" }))
+                    {
+                        <div class="form-group form-group-sm">
+                            @Html.Label("Brand")
+                            @Html.DropDownList("brandId", Model.Brands, "All", new { @class = "form-control input-sm" })
+                        </div>
+                        <div class="form-group form-group-sm">
+                            @Html.Label("Category")
+                            @Html.DropDownList("categoryId", Model.Categories, "All", new { @class = "form-control input-sm" })
+                        </div>
+                        @Html.Hidden("staffPage", Model.StaffPaging.CurrentPage)
+                        @Html.Hidden("custPage", Model.CustomerPaging.CurrentPage)
+                        <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+                    }
+                </div>
+
+                @if (Model.Product != null)
+                {
+                    <div class="row" style="margin-top: 15px;">
+                        <div class="col-xs-8">
+                            <h4>@Model.Product.product_name</h4>
+                            <div class="detail-row">
+                                <strong>Brand:</strong>
+                                <span>@Model.Product.brand.brand_name</span>
+                            </div>
+                            <div class="detail-row">
+                                <strong>Category:</strong>
+                                <span>@Model.Product.category.category_name</span>
+                            </div>
+                            <div class="detail-row">
+                                <strong>Year:</strong>
+                                <span>@Model.Product.model_year</span>
+                            </div>
+                            <div class="detail-row">
+                                <strong>Price:</strong>
+                                <span>@Model.Product.list_price.ToString("C")</span>
+                            </div>
+                        </div>
+                        <div class="col-xs-4">
+                            @{
+                                var imagePath = ImageHelper.GetImagePath(Model.Product.brand.brand_name);
+                            }
+                            <img src="@Url.Content(imagePath)" alt="@Model.Product.brand.brand_name" class="img-responsive img-rounded" />
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <p>No products found.</p>
+                }
+            </div>
+            <div class="panel-footer">
+                <div class="btn-group btn-group-justified" role="group">
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("<< Prev", "Index",
+                           new { staffPage = Model.StaffPaging.CurrentPage, custPage = Model.CustomerPaging.CurrentPage, prodPage = Model.ProductPaging.CurrentPage - 1, brandId = Request.QueryString["brandId"], categoryId = Request.QueryString["categoryId"] },
+                           new { @class = "btn btn-default " + (!Model.ProductPaging.HasPreviousPage ? "disabled" : "") })
+                    </div>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-default disabled" style="width:100%">
+                            @Model.ProductPaging.CurrentPage / @Model.ProductPaging.TotalPages
+                        </button>
+                    </div>
+                    <div class="btn-group" role="group">
+                        @Html.ActionLink("Next >>", "Index",
+                          new { staffPage = Model.StaffPaging.CurrentPage, custPage = Model.CustomerPaging.CurrentPage, prodPage = Model.ProductPaging.CurrentPage + 1, brandId = Request.QueryString["brandId"], categoryId = Request.QueryString["categoryId"] },
+                          new { @class = "btn btn-default " + (!Model.ProductPaging.HasNextPage ? "disabled" : "") })
+                    </div>
+                </div>
+
+                @if (Model.Product != null)
+                {
+                    <div class="btn-group btn-group-justified" role="group" style="margin-top: 5px;">
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-warning" onclick="loadModal('@Url.Action("Edit", "Products", new { id = Model.Product.product_id })')">
+                                Edit
+                            </button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-info" onclick="loadModal('@Url.Action("Details", "Products", new { id = Model.Product.product_id })')">
+                                Details
+                            </button>
+                        </div>
+                        <div class="btn-group" role="group">
+                            <button type="button" class="btn btn-danger" onclick="loadModal('@Url.Action("Delete", "Products", new { id = Model.Product.product_id })')">
+                                Delete
+                            </button>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+<div class="modal fade" id="formModal" tabindex="-1" role="dialog" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function loadModal(url) {
+            $('#formModal .modal-content').load(url, function () {
+                $('#formModal').modal('show');
+                var form = $('#formModal .modal-content').find('form');
+                $.validator.unobtrusive.parse(form);
+            });
+        }
+
+        $(document).on('submit', '#formModal form', function (e) {
+            e.preventDefault();
+
+            var form = $(this);
+
+            if (!form.valid()) {
+                return false;
+            }
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: form.serialize(),
+                success: function (result) {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        $('#formModal .modal-content').html(result);
+                        $.validator.unobtrusive.parse(form);
+                    }
+                },
+                error: function () {
+                    alert('An error occurred.');
+                }
+            });
+        });
+    </script>
+}

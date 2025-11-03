@@ -1,0 +1,162 @@
+﻿@model IEnumerable<u23693313_HW03.Models.DocumentArchive>
+
+@{
+    ViewBag.Title = "Reports";
+}
+
+<h2>Popular Products Report</h2>
+<p>This report shows the top 10 most popular products based on total quantity sold.</p>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Top 10 Products (by Quantity Sold)</h3>
+            </div>
+            <div class="panel-body">
+                <canvas id="popularProductsChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="panel panel-primary">
+            <div class="panel-heading">
+                <h3 class="panel-title">Save Full Report</h3>
+            </div>
+            <div class="panel-body">
+                <p>Save a PDF or CSV copy of the *full* product sales report.</p>
+                @using (Html.BeginForm("SaveReport", "Report", FormMethod.Post))
+                {
+                    @Html.AntiForgeryToken()
+                    <div class="form-group">
+                        @Html.Label("reportName", "Report Name")
+                        @Html.TextBox("reportName", "PopularProductReport_" + DateTime.Now.ToString("yyyy-MM-dd"), new { @class = "form-control" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("fileType", "File Type")
+                        @Html.DropDownList("fileType", new SelectList(
+                            new[] {
+                                new { Value = "pdf", Text = "PDF Document (.pdf)" },
+                                new { Value = "csv", Text = "Excel / CSV (.csv)" }
+                            },
+                            "Value", "Text"
+                        ), new { @class = "form-control" })
+                    </div>
+
+                    <div class="form-group">
+                        @Html.Label("description", "Description")
+                        @Html.TextArea("description", new { @class = "form-control", @id = "descriptionEditor" })
+                    </div>
+
+                    if (TempData["ReportError"] != null)
+                    {
+                        <div class="alert alert-danger">@TempData["ReportError"]</div>
+                    }
+                    <button type="submit" class="btn btn-success">Save Report</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <h3>Top 10 Report Data</h3>
+        <table class="table table-striped" id="reportDataTable">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Total Quantity Sold</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<hr />
+
+<h2>Document Archive</h2>
+<table class="table table-striped">
+    <tr>
+        <th>@Html.DisplayNameFor(model => model.ReportName)</th>
+
+        <th>@Html.DisplayNameFor(model => model.Description)</th>
+
+        <th>@Html.DisplayNameFor(model => model.ArchivedDate)</th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>@Html.DisplayFor(modelItem => item.ReportName)</td>
+
+            <td>@Html.Raw(item.Description)</td>
+
+            <td>@Html.DisplayFor(modelItem => item.ArchivedDate)</td>
+            <td style="width: 200px;">
+                @Html.ActionLink("Download", "DownloadFile", new { id = item.ArchiveId }, new { @class = "btn btn-primary btn-sm" })
+                @Html.ActionLink("Delete", "DeleteFile", new { id = item.ArchiveId }, new { @class = "btn btn-danger btn-sm" })
+            </td>
+        </tr>
+    }
+</table>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+
+            CKEDITOR.replace('descriptionEditor');
+
+            $.ajax({
+                url: "@Url.Action("GetChartData", "Report")",
+                type: "GET",
+                success: function (data) {
+
+                    var labels = [];
+                    var chartData = [];
+                    var tableBody = $("#reportDataTable tbody");
+
+                    $.each(data, function (i, item) {
+                        labels.push(item.ProductName);
+                        chartData.push(item.TotalSold);
+
+                        var row = "<tr><td>" + item.ProductName + "</td><td>" + item.TotalSold + "</td></tr>";
+                        tableBody.append(row);
+                    });
+
+                    var ctx = document.getElementById('popularProductsChart').getContext('2d');
+                    var myChart = new Chart(ctx, {
+                        type: 'bar',
+                        data: {
+                            labels: labels,
+                            datasets: [{
+                                label: 'Total Quantity Sold',
+                                data: chartData,
+                                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                                borderColor: 'rgba(54, 162, 235, 1)',
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                yAxes: [{
+                                    ticks: {
+                                        beginAtZero: true
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                },
+                error: function () {
+                    alert("Error loading chart data. Please check controller.");
+                }
+            });
+        });
+    </script>
+}

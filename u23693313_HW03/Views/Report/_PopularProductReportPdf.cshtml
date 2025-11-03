@@ -1,0 +1,60 @@
+﻿@model IEnumerable<u23693313_HW03.ViewModels.PopularProductViewModel>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Popular Product Report</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        h1 {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Popular Product Report</h1>
+    <p>This report shows all products ranked by total quantity sold, generated on @DateTime.Now.ToShortDateString().</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Total Quantity Sold</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.ProductName</td>
+                    <td>@item.TotalSold</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+</body>
+</html>
